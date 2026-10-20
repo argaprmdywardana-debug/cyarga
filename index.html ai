@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Karya - Generator Konten Promosi UMKM Berbasis AI</title>
+    
+    <!-- CSS Internal (Gaya & Tata Letak UI/UX) -->
+    <style>
+        /* RESET & PENGATURAN DASAR */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* HEADER & NAVIGASI */
+        header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-ai {
+            background-color: #f59e0b;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            color: #1f2937;
+            margin-bottom: 0.8rem;
+        }
+
+        .hero p {
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto 1.5rem;
+        }
+
+        /* CONTAINER UTAMA / APLIKASI WEB */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* KARTU FORM INPUT & HASIL */
+        .card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* FORM KONTROL */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        /* BUTTONS */
+        .btn-primary {
+            width: 100%;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-secondary {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: #059669;
+        }
+
+        /* PANEL HASIL AI (PREVIEW) */
+        .preview-box {
+            background-color: #f9fafb;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .preview-content {
+            width: 100%;
+            text-align: left;
+            display: none; /* Disembunyikan sebelum AI memproses */
+        }
+
+        .poster-mockup {
+            background: linear-gradient(135deg, #f3e8ff, #e0e7ff);
+            border-left: 4px solid #7c3aed;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .poster-mockup h3 {
+            color: #5b21b6;
+            margin-bottom: 0.3rem;
+        }
+
+        /* INDIKATOR LOADING */
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* SEKSI MONETISASI / PAKET HARGA */
+        .pricing-section {
+            background: #ffffff;
+            padding: 3rem 1rem;
+            margin-top: 3rem;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            max-width: 800px;
+            margin: 2rem auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .price-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1.5rem;
+            background: #fff;
+            position: relative;
+        }
+
+        .price-card.popular {
+            border: 2px solid #4f46e5;
+        }
+
+        .price-card.popular::before {
+            content: 'Paling Laris';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4f46e5;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #111827;
+            margin: 0.8rem 0;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: #1f2937;
+            color: #9ca3af;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGASI UTAMA -->
+    <header>
+        <div class="logo">
+            <span>✨ AI-Karya</span>
+            <span class="badge-ai">PROTOTIPE SMK</span>
+        </div>
+        <div>
+            <small>Solusi Bisnis Digital UMKM</small>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h1>Buat Konten Promosi UMKM Secara Otomatis</h1>
+        <p>Hemat waktu dan biaya! Cukup masukkan detail produk Anda, biarkan Asisten AI merancang ide materi promosi dan teks penawaran yang siap pakai.</p>
+    </section>
+
+    <!-- CONTAINER PROTOTIPE UTAMA -->
+    <main class="container">
+        
+        <!-- FORM INPUT WIRAUSAHA (SISI KIRI) -->
+        <section class="card">
+            <h2>📝 Input Detail Produk</h2>
+            <form id="aiForm">
+                <div class="form-group">
+                    <label for="namaProduk">Nama Produk / Jasa:</label>
+                    <input type="text" id="namaProduk" placeholder="Contoh: Keripik Singkong Pedas" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="kategori">Kategori Bisnis:</label>
+                    <select id="kategori" required>
+                        <option value="Kuliner / Makanan">Kuliner / Makanan & Minuman</option>
+                        <option value="Fashion & Pakaian">Fashion & Aksesoris</option>
+                        <option value="Jasa Kreatif">Jasa Kreatif & Servis</option>
+                        <option value="Kecantikan & Kesehatan">Kecantikan & Kesehatan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="keunggulan">Keunggulan Utama Produk:</label>
+                    <textarea id="keunggulan" rows="3" placeholder="Contoh: Renyah, tanpa pengawet, terbuat dari cabai asli" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetAudience">Gaya Bahasa Promosi:</label>
+                    <select id="gayaBahasa">
+                        <option value="Santai & Kekinian">Santai & Kekinian (Anak Muda)</option>
+                        <option value="Profesional & Elegan">Profesional & Elegan</option>
+                        <option value="Persuasif & Diskon">Sangat Persuasif & Promo</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary" id="btnSubmit">✨ Sapa AI & Buat Konten</button>
+            </form>
+        </section>
+
+        <!-- PREVIEW HASIL AI (SISI KANAN) -->
+        <section class="card">
+            <h2>🚀 Hasil Generator AI</h2>
+            
+            <div class="preview-box" id="previewBox">
+                <!-- Tampilan Default Sebelum Tombol Ditekan -->
+                <div id="emptyState">
+                    <p style="color: #9ca3af;">Isi formulir di sebelah kiri dan klik tombol untuk melihat keajaiban AI!</p>
+                </div>
+
+                <!-- Animasi Loading -->
+                <div class="loader" id="loader"></div>
+                <p id="loadingText" style="display: none; color: #4f46e5; font-weight: 500;">AI sedang merancang copywriting & ide poster...</p>
+
+                <!-- Tampilan Output Setelah Diproses -->
+                <div class="preview-content" id="previewContent">
+                    <div class="poster-mockup">
+                        <small style="color: #7c3aed; font-weight: bold;">Rekomendasi Judul Poster (Headline):</small>
+                        <h3 id="outHeadline">Judul Promosi Disini</h3>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <small style="color: #4b5563; font-weight: bold;">Naskah Caption Sosial Media:</small>
+                        <p id="outCaption" style="font-size: 0.9rem; background: #fff; padding: 0.8rem; border-radius: 6px; border: 1px solid #e5e7eb; margin-top: 0.3rem;"></p>
+                    </div>
+
+                    <div>
+                        <small style="color: #4b5563; font-weight: bold;">Rekomendasi Tagar (Hashtags):</small>
+                        <p id="outHashtags" style="font-size: 0.85rem; color: #4f46e5; font-weight: 600; margin-top: 0.2rem;"></p>
+                    </div>
+
+                    <button class="btn-secondary" onclick="salinKonten()">📋 Salin Teks Promosi</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- SEKSI MODEL BISNIS & MONETISASI -->
+    <section class="pricing-section">
+        <h2>Pilihan Paket Berlangganan (Model Bisnis)</h2>
+        <p style="color: #6b7280; font-size: 0.95rem;">Potensi Pendapatan Startup AI-Karya untuk UMKM</p>
+
+        <div class="pricing-grid">
+            <!-- Paket Gratis -->
+            <div class="price-card">
+                <h3>Starter Gratis</h3>
+                <div class="price">Rp 0</div>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">Coba gratis layanan dasar AI</p>
+                <ul style="text-align: left; font-size: 0.85rem; color: #4b5563; padding-left: 1.2rem; margin-bottom: 1rem;">
+                    <li>3 Generasi Konten/hari</li>
+                    <li>Gaya Bahasa Standar</li>
+                    <li>Dukungan Komunitas</li>
+                </ul>
+                <button style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; background: white; border-radius: 6px;">Paket Saat Ini</button>
+            </div>
+
+            <!-- Paket Berbayar (Pro) -->
+            <div class="price-card popular">
+                <h3>Pro UMKM</h3>
+                <div class="price">Rp 25.000<span style="font-size: 0.8rem; font-weight: normal;">/bulan</span></div>
+                <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">Solusi hemat lengkap untuk usaha</p>
+                <ul style="text-align: left; font-size: 0.85rem; color: #4b5563; padding-left: 1.2rem; margin-bottom: 1rem;">
+                    <li>Generasi Konten Tanpa Batas</li>
+                    <li>Semua Gaya Bahasa AI</li>
+                    <li>Rekomendasi Visual Gambar</li>
+                    <li>Prioritas Layanan CS</li>
+                </ul>
+                <button class="btn-primary">Tingkatkan ke Pro</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2026 AI-Karya - Prototipe Wirausaha Digital Siswa SMK. Dipandu oleh AI Startup Mentor.</p>
+    </footer>
+
+    <!-- JAVASCRIPT INTERNAL (LOGIKA SIMULASI AI & INTERAKSI) -->
+    <script>
+        // Menangkap Elemen DOM
+        const aiForm = document.getElementById('aiForm');
+        const emptyState = document.getElementById('emptyState');
+        const loader = document.getElementById('loader');
+        const loadingText = document.getElementById('loadingText');
+        const previewContent = document.getElementById('previewContent');
+
+        // Output Elemen
+        const outHeadline = document.getElementById('outHeadline');
+        const outCaption = document.getElementById('outCaption');
+        const outHashtags = document.getElementById('outHashtags');
+
+        // Menyimpan Event listener saat Form di-submit
+        aiForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah reload halaman
+
+            // Ambil Nilai dari Form
+            const nama = document.getElementById('namaProduk').value;
+            const kategori = document.getElementById('kategori').value;
+            const keunggulan = document.getElementById('keunggulan').value;
+            const gaya = document.getElementById('gayaBahasa').value;
+
+            // Tampilkan Loading State
+            emptyState.style.display = 'none';
+            previewContent.style.display = 'none';
+            loader.style.display = 'block';
+            loadingText.style.display = 'block';
+
+            // Simulasi Pemrosesan AI dengan Delay 1.5 Detik
+            setTimeout(() => {
+                // Sembunyikan Loading
+                loader.style.display = 'none';
+                loadingText.style.display = 'none';
+
+                // Logika Pembentukan Konten AI (Simulasi Algoritma Pintar)
+                let headlineResult = "";
+                let captionResult = "";
+                let hashtagResult = "";
+
+                if (gaya === "Santai & Kekinian") {
+                    headlineResult = `🔥 Ketagihan Baru! Cobain ${nama} Sekarang!`;
+                    captionResult = `Buat kamu yang lagi nyari ${kategori} kualitas terbaik, ${nama} hadir buat nemenin hari kamu! Kenapa harus coba? Karena ${keunggulan}. Cek sekarang sebelum kehabisan! 😎🚀`;
+                    hashtagResult = `#${nama.replace(/\s+/g, '')} #KulinerHits #AnakMudaKreatif #${kategori.replace(/\s+/g, '')} #UMKMLokal`;
+                } else if (gaya === "Profesional & Elegan") {
+                    headlineResult = `Empowering Your Life with ${nama}`;
+                    captionResult = `Nikmati kualitas unggulan dari ${nama}. Kami menghadirkan solusi ${kategori} terbaik dengan fokus pada ${keunggulan}. Pilihan tepat untuk kenyamanan dan kepuasan Anda.`;
+                    hashtagResult = `#${nama.replace(/\s+/g, '')} #KualitasTerbaik #Solusi${kategori.replace(/\s+/g, '')} #ProfessionalChoice`;
+                } else {
+                    headlineResult = `💥 PROMO SPESIAL! Hemat Beli ${nama} Hari Ini!`;
+                    captionResult = `Jangan sampai terlewat! Dapatkan ${nama} dengan keunggulan istimewa: ${keunggulan}. Penawaran terbatas khusus minggu ini saja! Pesan sekarang juga! 🛒✨`;
+                    hashtagResult = `#Promo${nama.replace(/\s+/g, '')} #DiskonHariIni #BeliSekarang #${kategori.replace(/\s+/g, '')}`;
+                }
+
+                // Masukkan Hasil Simulasi ke DOM Output
+                outHeadline.innerText = headlineResult;
+                outCaption.innerText = captionResult;
+                outHashtags.innerText = hashtagResult;
+
+                // Tampilkan Output Panel
+                previewContent.style.display = 'block';
+
+            }, 1500); // 1.5 detik delay
+        });
+
+        // Fungsi Salin Teks
+        function salinKonten() {
+            const teksSalin = `${outHeadline.innerText}\n\n${outCaption.innerText}\n\n${outHashtags.innerText}`;
+            navigator.clipboard.writeText(teksSalin).then(() => {
+                alert('Teks promosi berhasil disalin ke clipboard!');
+            }).catch(err => {
+                alert('Gagal menyalin teks.');
+            });
+        }
+    </script>
+</body>
+</html>
